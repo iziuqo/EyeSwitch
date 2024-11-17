@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import dynamic from 'next/dynamic'
 
-const EyeSwitch = dynamic(() => import('@/lib/eye-switch'), { ssr: false })
+// Instead of dynamic import, we'll use a regular import and initialize the class on the client
+let EyeSwitch: any = null
 
 export default function EyeSwitchDemo() {
   const [passwordFields, setPasswordFields] = useState({
@@ -20,7 +20,7 @@ export default function EyeSwitchDemo() {
   const [mode, setMode] = useState<"focus" | "all">("focus")
   const [keyCombo, setKeyCombo] = useState<string>("Ctrl+8")
   const [logs, setLogs] = useState<string[]>([])
-  const eyeSwitchRef = useRef<EyeSwitch | null>(null)
+  const eyeSwitchRef = useRef<any>(null)
 
   const addLog = useCallback((message: string) => {
     setLogs(prev => [message, ...prev.slice(0, 4)])
@@ -28,11 +28,16 @@ export default function EyeSwitchDemo() {
 
   useEffect(() => {
     const initEyeSwitch = async () => {
-      const EyeSwitchClass = await EyeSwitch
-      eyeSwitchRef.current = new EyeSwitchClass()
+      // Dynamically import the EyeSwitch class only on the client side
+      if (!EyeSwitch) {
+        const module = await import('@/lib/eye-switch')
+        EyeSwitch = module.default
+      }
+
+      eyeSwitchRef.current = new EyeSwitch()
       const eyeSwitch = eyeSwitchRef.current
 
-      eyeSwitch.on('visibilityChanged', ({ isVisible, affectedFields }) => {
+      eyeSwitch.on('visibilityChanged', ({ isVisible, affectedFields }: any) => {
         setPasswordFields(prev => {
           const newState = { ...prev }
           if (affectedFields === 'all') {
@@ -50,12 +55,12 @@ export default function EyeSwitchDemo() {
         addLog(`Password ${isVisible ? "shown" : "hidden"} - (${mode} mode)`)
       })
 
-      eyeSwitch.on('modeChanged', (newMode) => {
-        setMode(newMode)
+      eyeSwitch.on('modeChanged', (newMode: string) => {
+        setMode(newMode as "focus" | "all")
         addLog(`Switched to ${newMode === "all" ? "Toggle All" : "Focus"} Mode`)
       })
 
-      eyeSwitch.on('keyComboChanged', (newKeyCombo) => {
+      eyeSwitch.on('keyComboChanged', (newKeyCombo: string) => {
         setKeyCombo(newKeyCombo)
         addLog(`Key combo changed to ${newKeyCombo}`)
       })
@@ -69,10 +74,6 @@ export default function EyeSwitchDemo() {
     }
 
     initEyeSwitch()
-
-    return () => {
-      // ... cleanup code
-    }
   }, [addLog, mode])
 
   const handleFocus = useCallback((fieldName: 'password' | 'confirmPassword') => {
@@ -90,7 +91,7 @@ export default function EyeSwitchDemo() {
   const handleKeyComboChange = useCallback((value: string) => {
     eyeSwitchRef.current?.setKeyCombo(value)
   }, [])
-
+  
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200 p-4 flex items-center justify-center antialiased">
       <div className="w-full max-w-5xl backdrop-blur-xl bg-gray-900/50 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] border border-gray-800 overflow-hidden flex flex-col">
