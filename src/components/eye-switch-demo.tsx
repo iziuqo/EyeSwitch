@@ -325,4 +325,4 @@ const EyeSwitchDemo = () => {
   )
 }
 
-export { EyeSwitchDemo }
+default export { EyeSwitchDemo }
