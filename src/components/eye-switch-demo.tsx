@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import EyeSwitch from "@/lib/eye-switch"
+import dynamic from 'next/dynamic'
+
+const EyeSwitch = dynamic(() => import('@/lib/eye-switch'), { ssr: false })
 
 export default function EyeSwitchDemo() {
   const [passwordFields, setPasswordFields] = useState({
@@ -25,42 +27,51 @@ export default function EyeSwitchDemo() {
   }, [])
 
   useEffect(() => {
-    eyeSwitchRef.current = new EyeSwitch()
-    const eyeSwitch = eyeSwitchRef.current
+    const initEyeSwitch = async () => {
+      const EyeSwitchClass = await EyeSwitch
+      eyeSwitchRef.current = new EyeSwitchClass()
+      const eyeSwitch = eyeSwitchRef.current
 
-    eyeSwitch.on('visibilityChanged', ({ isVisible, affectedFields }) => {
-      setPasswordFields(prev => {
-        const newState = { ...prev }
-        if (affectedFields === 'all') {
-          Object.keys(newState).forEach(key => {
-            newState[key as keyof typeof newState].visible = isVisible
-          })
-        } else {
-          const field = newState[affectedFields as keyof typeof newState]
-          if (field) {
-            field.visible = isVisible
+      eyeSwitch.on('visibilityChanged', ({ isVisible, affectedFields }) => {
+        setPasswordFields(prev => {
+          const newState = { ...prev }
+          if (affectedFields === 'all') {
+            Object.keys(newState).forEach(key => {
+              newState[key as keyof typeof newState].visible = isVisible
+            })
+          } else {
+            const field = newState[affectedFields as keyof typeof newState]
+            if (field) {
+              field.visible = isVisible
+            }
           }
-        }
-        return newState
+          return newState
+        })
+        addLog(`Password ${isVisible ? "shown" : "hidden"} - (${mode} mode)`)
       })
-      addLog(`Password ${isVisible ? "shown" : "hidden"} - (${mode} mode)`)
-    })
 
-    eyeSwitch.on('modeChanged', (newMode) => {
-      setMode(newMode)
-      addLog(`Switched to ${newMode === "all" ? "Toggle All" : "Focus"} Mode`)
-    })
+      eyeSwitch.on('modeChanged', (newMode) => {
+        setMode(newMode)
+        addLog(`Switched to ${newMode === "all" ? "Toggle All" : "Focus"} Mode`)
+      })
 
-    eyeSwitch.on('keyComboChanged', (newKeyCombo) => {
-      setKeyCombo(newKeyCombo)
-      addLog(`Key combo changed to ${newKeyCombo}`)
-    })
+      eyeSwitch.on('keyComboChanged', (newKeyCombo) => {
+        setKeyCombo(newKeyCombo)
+        addLog(`Key combo changed to ${newKeyCombo}`)
+      })
 
-    const handleKeyDown = (event: KeyboardEvent) => eyeSwitch.handleKeyDown(event)
-    window.addEventListener('keydown', handleKeyDown)
+      const handleKeyDown = (event: KeyboardEvent) => eyeSwitch.handleKeyDown(event)
+      window.addEventListener('keydown', handleKeyDown)
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown)
+      }
+    }
+
+    initEyeSwitch()
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      // ... cleanup code
     }
   }, [addLog, mode])
 
