@@ -9,7 +9,6 @@ import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Instead of dynamic import, we'll use a regular import and initialize the class on the client
 let EyeSwitch: any = null
 
 export default function EyeSwitchDemo() {
@@ -28,7 +27,6 @@ export default function EyeSwitchDemo() {
 
   useEffect(() => {
     const initEyeSwitch = async () => {
-      // Dynamically import the EyeSwitch class only on the client side
       if (!EyeSwitch) {
         const module = await import('@/lib/eye-switch')
         EyeSwitch = module.default
@@ -91,7 +89,7 @@ export default function EyeSwitchDemo() {
   const handleKeyComboChange = useCallback((value: string) => {
     eyeSwitchRef.current?.setKeyCombo(value)
   }, [])
-  
+
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200 p-4 flex items-center justify-center antialiased">
       <div className="w-full max-w-5xl backdrop-blur-xl bg-gray-900/50 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] border border-gray-800 overflow-hidden flex flex-col">
