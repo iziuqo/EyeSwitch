@@ -1,3 +1,5 @@
+console.log('globals.css is being processed');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
