@@ -1,33 +1,34 @@
-type EyeSwitchOptions = {
-  toggleMode: 'focus' | 'all';
-  keyCombo: string;
-  onToggle: () => void;
-};
-
 class EyeSwitch {
-  private options: EyeSwitchOptions;
-
-  constructor(options: Partial<EyeSwitchOptions> = {}) {
+  constructor(options = {}) {
     this.options = {
       toggleMode: 'focus',
-      keyCombo: navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? 'Cmd+8' : 'Ctrl+8',
-      onToggle: () => {},
+      keyCombo: this.getDefaultKeyCombo(),
       ...options
     };
-
-    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.state = {
+      isVisible: false,
+      focusedFieldId: null
+    };
+    this.eventListeners = {};
   }
 
-  public setToggleMode(mode: 'focus' | 'all') {
-    this.options.toggleMode = mode;
+  getDefaultKeyCombo() {
+    return typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'Cmd+8' : 'Ctrl+8';
   }
 
-  public setKeyCombo(keyCombo: string) {
+  setToggleMode(mode) {
+    if (mode === 'focus' || mode === 'all') {
+      this.options.toggleMode = mode;
+      this.emit('modeChanged', mode);
+    }
+  }
+
+  setKeyCombo(keyCombo) {
     this.options.keyCombo = keyCombo;
+    this.emit('keyComboChanged', keyCombo);
   }
 
-  public handleKeyDown(event: KeyboardEvent) {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  handleKeyDown(event) {
     const key = event.key.toLowerCase();
     const ctrl = event.ctrlKey;
     const cmd = event.metaKey;
@@ -41,7 +42,42 @@ class EyeSwitch {
       (this.options.keyCombo === 'Alt+P' && alt && key === 'p')
     ) {
       event.preventDefault();
-      this.options.onToggle();
+      this.toggle();
+    }
+  }
+
+  setFocusedField(fieldId) {
+    this.state.focusedFieldId = fieldId;
+  }
+
+  toggle() {
+    if (this.options.toggleMode === 'focus' && !this.state.focusedFieldId) {
+      return;
+    }
+
+    this.state.isVisible = !this.state.isVisible;
+    this.emit('visibilityChanged', {
+      isVisible: this.state.isVisible,
+      affectedFields: this.options.toggleMode === 'all' ? 'all' : this.state.focusedFieldId
+    });
+  }
+
+  on(eventName, callback) {
+    if (!this.eventListeners[eventName]) {
+      this.eventListeners[eventName] = [];
+    }
+    this.eventListeners[eventName].push(callback);
+  }
+
+  off(eventName, callback) {
+    if (this.eventListeners[eventName]) {
+      this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
+    }
+  }
+
+  emit(eventName, data) {
+    if (this.eventListeners[eventName]) {
+      this.eventListeners[eventName].forEach(callback => callback(data));
     }
   }
 }
