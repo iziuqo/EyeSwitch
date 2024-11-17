@@ -1,8 +1,32 @@
+interface EyeSwitchOptions {
+  toggleMode?: 'focus' | 'all';
+  keyCombo?: string;
+  onToggle?: () => void;
+}
+
+interface EyeSwitchState {
+  isVisible: boolean;
+  focusedFieldId: string | null;
+}
+
+interface VisibilityChangeEvent {
+  isVisible: boolean;
+  affectedFields: 'all' | string;
+}
+
+type EventCallback = (data: any) => void;
+type EventListeners = { [key: string]: EventCallback[] };
+
 class EyeSwitch {
-  constructor(options = {}) {
+  private options: EyeSwitchOptions;
+  private state: EyeSwitchState;
+  private eventListeners: EventListeners;
+
+  constructor(options: EyeSwitchOptions = {}) {
     this.options = {
       toggleMode: 'focus',
       keyCombo: this.getDefaultKeyCombo(),
+      onToggle: () => {},
       ...options
     };
     this.state = {
@@ -12,26 +36,24 @@ class EyeSwitch {
     this.eventListeners = {};
   }
 
-  getDefaultKeyCombo() {
+  private getDefaultKeyCombo(): string {
     if (typeof window !== 'undefined') {
-      return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform) ? 'Cmd+8' : 'Ctrl+8'
+      return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform) ? 'Cmd+8' : 'Ctrl+8';
     }
-    return 'Ctrl+8' // Default for server-side rendering
+    return 'Ctrl+8';
   }
 
-  setToggleMode(mode) {
-    if (mode === 'focus' || mode === 'all') {
-      this.options.toggleMode = mode;
-      this.emit('modeChanged', mode);
-    }
+  public setToggleMode(mode: 'focus' | 'all'): void {
+    this.options.toggleMode = mode;
+    this.emit('modeChanged', mode);
   }
 
-  setKeyCombo(keyCombo) {
+  public setKeyCombo(keyCombo: string): void {
     this.options.keyCombo = keyCombo;
     this.emit('keyComboChanged', keyCombo);
   }
 
-  handleKeyDown(event) {
+  public handleKeyDown(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
     const ctrl = event.ctrlKey;
     const cmd = event.metaKey;
@@ -49,11 +71,11 @@ class EyeSwitch {
     }
   }
 
-  setFocusedField(fieldId) {
+  public setFocusedField(fieldId: string): void {
     this.state.focusedFieldId = fieldId;
   }
 
-  toggle() {
+  public toggle(): void {
     if (this.options.toggleMode === 'focus' && !this.state.focusedFieldId) {
       return;
     }
@@ -63,22 +85,26 @@ class EyeSwitch {
       isVisible: this.state.isVisible,
       affectedFields: this.options.toggleMode === 'all' ? 'all' : this.state.focusedFieldId
     });
+
+    if (this.options.onToggle) {
+      this.options.onToggle();
+    }
   }
 
-  on(eventName, callback) {
+  public on(eventName: string, callback: EventCallback): void {
     if (!this.eventListeners[eventName]) {
       this.eventListeners[eventName] = [];
     }
     this.eventListeners[eventName].push(callback);
   }
 
-  off(eventName, callback) {
+  public off(eventName: string, callback: EventCallback): void {
     if (this.eventListeners[eventName]) {
       this.eventListeners[eventName] = this.eventListeners[eventName].filter(cb => cb !== callback);
     }
   }
 
-  emit(eventName, data) {
+  private emit(eventName: string, data: any): void {
     if (this.eventListeners[eventName]) {
       this.eventListeners[eventName].forEach(callback => callback(data));
     }
