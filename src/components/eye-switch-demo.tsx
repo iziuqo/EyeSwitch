@@ -40,7 +40,7 @@ const createEyeSwitch = (options = {}) => {
   }
 }
 
-export default function EyeSwitchDemo() {
+const EyeSwitchDemo = () => {
   const [passwordFields, setPasswordFields] = useState({
     password: { visible: false, ref: useRef<HTMLInputElement>(null) },
     confirmPassword: { visible: false, ref: useRef<HTMLInputElement>(null) }
@@ -324,3 +324,5 @@ export default function EyeSwitchDemo() {
     </div>
   )
 }
+
+export { EyeSwitchDemo }
