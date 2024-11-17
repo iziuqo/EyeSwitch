@@ -8,39 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import EyeSwitch from "@/lib/eye-switch"
 
-const createEyeSwitch = (options = {}) => {
-  const defaultOptions = {
-    toggleMode: 'focus',
-    keyCombo: navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? 'Cmd+8' : 'Ctrl+8',
-    onToggle: () => {},
-    ...options
-  }
-
-  return {
-    ...defaultOptions,
-    handleKeyDown: (event: KeyboardEvent) => {
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
-      const key = event.key.toLowerCase()
-      const ctrl = event.ctrlKey
-      const cmd = event.metaKey
-      const shift = event.shiftKey
-      const alt = event.altKey
-
-      if (
-        (defaultOptions.keyCombo === 'Ctrl+8' && ctrl && key === '8') ||
-        (defaultOptions.keyCombo === 'Cmd+8' && cmd && key === '8') ||
-        (defaultOptions.keyCombo === 'Ctrl+Shift+L' && ctrl && shift && key === 'l') ||
-        (defaultOptions.keyCombo === 'Alt+P' && alt && key === 'p')
-      ) {
-        event.preventDefault()
-        defaultOptions.onToggle()
-      }
-    }
-  }
-}
-
-const EyeSwitchDemo = () => {
+export default function EyeSwitchDemo() {
   const [passwordFields, setPasswordFields] = useState({
     password: { visible: false, ref: useRef<HTMLInputElement>(null) },
     confirmPassword: { visible: false, ref: useRef<HTMLInputElement>(null) }
@@ -48,84 +18,67 @@ const EyeSwitchDemo = () => {
   const [mode, setMode] = useState<"focus" | "all">("focus")
   const [keyCombo, setKeyCombo] = useState<string>("Ctrl+8")
   const [logs, setLogs] = useState<string[]>([])
-  const lastToggleRef = useRef<boolean | null>(null)
+  const eyeSwitchRef = useRef<EyeSwitch | null>(null)
 
   const addLog = useCallback((message: string) => {
     setLogs(prev => [message, ...prev.slice(0, 4)])
   }, [])
 
-  const togglePasswordVisibility = useCallback((fieldName: 'password' | 'confirmPassword') => {
-    setPasswordFields(prev => {
-      const newState = { ...prev }
-      if (mode === 'focus') {
-        newState[fieldName].visible = !newState[fieldName].visible
-        lastToggleRef.current = newState[fieldName].visible
-      } else {
-        const newVisibility = !lastToggleRef.current
-        Object.keys(newState).forEach(key => {
-          newState[key as keyof typeof newState].visible = newVisibility
-        })
-        lastToggleRef.current = newVisibility
-      }
-      addLog(`Password ${newState[fieldName].visible ? "shown" : "hidden"} - (${mode} mode)`)
-      return newState
-    })
-  }, [mode, addLog])
-
-  const handleToggle = useCallback(() => {
-    const focusedField = document.activeElement as HTMLInputElement
-    if (mode === 'focus') {
-      if (focusedField === passwordFields.password.ref.current) {
-        togglePasswordVisibility('password')
-      } else if (focusedField === passwordFields.confirmPassword.ref.current) {
-        togglePasswordVisibility('confirmPassword')
-      }
-    } else {
-      togglePasswordVisibility('password')
-    }
-  }, [mode, passwordFields, togglePasswordVisibility])
-
   useEffect(() => {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
-    setKeyCombo(isMac ? "Cmd+8" : "Ctrl+8")
-  }, [])
+    eyeSwitchRef.current = new EyeSwitch()
+    const eyeSwitch = eyeSwitchRef.current
 
-  useEffect(() => {
-    const eyeSwitch = createEyeSwitch({
-      toggleMode: mode,
-      keyCombo: keyCombo,
-      onToggle: handleToggle
-    })
-
-    window.addEventListener('keydown', eyeSwitch.handleKeyDown)
-
-    return () => {
-      window.removeEventListener('keydown', eyeSwitch.handleKeyDown)
-    }
-  }, [mode, keyCombo, handleToggle])
-
-  const handleKeyComboChange = (value: string) => {
-    setKeyCombo(value)
-    addLog(`Key combo changed to ${value}`)
-  }
-
-  const handleModeChange = (checked: boolean) => {
-    const newMode = checked ? "all" : "focus"
-    setMode(newMode)
-    addLog(`Switched to ${newMode === "all" ? "Toggle All" : "Focus"} Mode`)
-    
-    if (newMode === "all") {
+    eyeSwitch.on('visibilityChanged', ({ isVisible, affectedFields }) => {
       setPasswordFields(prev => {
         const newState = { ...prev }
-        const newVisibility = !lastToggleRef.current
-        Object.keys(newState).forEach(key => {
-          newState[key as keyof typeof newState].visible = newVisibility
-        })
-        addLog(`All passwords ${newVisibility ? "shown" : "hidden"} due to mode change`)
+        if (affectedFields === 'all') {
+          Object.keys(newState).forEach(key => {
+            newState[key as keyof typeof newState].visible = isVisible
+          })
+        } else {
+          const field = newState[affectedFields as keyof typeof newState]
+          if (field) {
+            field.visible = isVisible
+          }
+        }
         return newState
       })
+      addLog(`Password ${isVisible ? "shown" : "hidden"} - (${mode} mode)`)
+    })
+
+    eyeSwitch.on('modeChanged', (newMode) => {
+      setMode(newMode)
+      addLog(`Switched to ${newMode === "all" ? "Toggle All" : "Focus"} Mode`)
+    })
+
+    eyeSwitch.on('keyComboChanged', (newKeyCombo) => {
+      setKeyCombo(newKeyCombo)
+      addLog(`Key combo changed to ${newKeyCombo}`)
+    })
+
+    const handleKeyDown = (event: KeyboardEvent) => eyeSwitch.handleKeyDown(event)
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
     }
-  }
+  }, [addLog, mode])
+
+  const handleFocus = useCallback((fieldName: 'password' | 'confirmPassword') => {
+    eyeSwitchRef.current?.setFocusedField(fieldName)
+  }, [])
+
+  const handleToggle = useCallback((fieldName: 'password' | 'confirmPassword') => {
+    eyeSwitchRef.current?.toggle()
+  }, [])
+
+  const handleModeChange = useCallback((checked: boolean) => {
+    eyeSwitchRef.current?.setToggleMode(checked ? "all" : "focus")
+  }, [])
+
+  const handleKeyComboChange = useCallback((value: string) => {
+    eyeSwitchRef.current?.setKeyCombo(value)
+  }, [])
 
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200 p-4 flex items-center justify-center antialiased">
@@ -171,6 +124,7 @@ const EyeSwitchDemo = () => {
                       type={passwordFields.password.visible ? "text" : "password"}
                       placeholder="Enter your password"
                       className="bg-gray-900/30 border-gray-800 text-gray-200 placeholder:text-gray-600 text-sm h-9"
+                      onFocus={() => handleFocus('password')}
                     />
                     <TooltipProvider>
                       <Tooltip>
@@ -180,7 +134,7 @@ const EyeSwitchDemo = () => {
                             variant="ghost"
                             size="icon"
                             className="absolute right-0 top-0 h-full px-2 py-1 hover:bg-gray-800/30 text-gray-400 hover:text-gray-200"
-                            onClick={() => togglePasswordVisibility('password')}
+                            onClick={() => handleToggle('password')}
                             aria-label={passwordFields.password.visible ? "Hide password" : "Show password"}
                           >
                             {passwordFields.password.visible ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -203,6 +157,7 @@ const EyeSwitchDemo = () => {
                       type={passwordFields.confirmPassword.visible ? "text" : "password"}
                       placeholder="Confirm your password"
                       className="bg-gray-900/30 border-gray-800 text-gray-200 placeholder:text-gray-600 text-sm h-9"
+                      onFocus={() => handleFocus('confirmPassword')}
                     />
                     <TooltipProvider>
                       <Tooltip>
@@ -212,7 +167,7 @@ const EyeSwitchDemo = () => {
                             variant="ghost"
                             size="icon"
                             className="absolute right-0 top-0 h-full px-2 py-1 hover:bg-gray-800/30 text-gray-400 hover:text-gray-200"
-                            onClick={() => togglePasswordVisibility('confirmPassword')}
+                            onClick={() => handleToggle('confirmPassword')}
                             aria-label={passwordFields.confirmPassword.visible ? "Hide password" : "Show password"}
                           >
                             {passwordFields.confirmPassword.visible ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
@@ -324,5 +279,3 @@ const EyeSwitchDemo = () => {
     </div>
   )
 }
-
-export { EyeSwitchDemo }
