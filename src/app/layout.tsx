@@ -1,11 +1,12 @@
-import '@/styles/globals.css'
+import './globals.css'
+import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'EyeSwitch Demo',
-  description: 'A demo of the EyeSwitch password visibility toggle component',
+  description: 'Seamless password visibility control with keyboard shortcuts',
 }
 
 export default function RootLayout({
