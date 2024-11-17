@@ -13,7 +13,10 @@ class EyeSwitch {
   }
 
   getDefaultKeyCombo() {
-    return typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'Cmd+8' : 'Ctrl+8';
+    if (typeof window !== 'undefined') {
+      return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform) ? 'Cmd+8' : 'Ctrl+8'
+    }
+    return 'Ctrl+8' // Default for server-side rendering
   }
 
   setToggleMode(mode) {
