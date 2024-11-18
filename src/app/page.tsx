@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from "@/components/ui/button"
-import { Coffee, ExternalLink, Github, EyeIcon, Play, Eye, EyeOff, ChevronRight } from 'lucide-react'
+import { Coffee, Github, EyeIcon, Play, Eye, EyeOff, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from "@/components/ui/input"
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
-export default function Home() {
+export default function Component() {
   const [activeSection, setActiveSection] = useState('features')
   const [showPassword, setShowPassword] = useState(false)
   const [isMac, setIsMac] = useState(false)
@@ -24,7 +26,7 @@ export default function Home() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 64; // Add offset for header
+      const scrollPosition = window.scrollY + 64
 
       const sections = [
         { id: 'features', ref: featuresRef },
@@ -60,25 +62,83 @@ export default function Home() {
 
   const scrollToSection = (sectionRef: React.RefObject<HTMLElement>) => {
     if (sectionRef.current) {
-      const headerHeight = 64; // Adjust this value based on your header's actual height
-      const elementPosition = sectionRef.current.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+      const headerHeight = 64
+      const elementPosition = sectionRef.current.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerHeight
 
       window.scrollTo({
         top: offsetPosition,
         behavior: "smooth"
-      });
+      })
     }
   }
+
+  const basicUsageCode = `
+import EyeSwitch from 'eye-switch';
+
+const eyeSwitch = new EyeSwitch({
+  toggleMode: 'all',
+  keyCombo: 'Ctrl+Shift+L',
+  onToggle: () => console.log('Visibility toggled')
+});
+
+eyeSwitch.on('visibilityChanged', ({ isVisible, affectedFields }) => {
+  const passwordFields = document.querySelectorAll('input[type="password"]');
+  passwordFields.forEach(field => {
+    field.type = isVisible ? 'text' : 'password';
+  });
+});
+
+document.addEventListener('keydown', (event) => eyeSwitch.handleKeyDown(event));
+
+document.querySelector('#toggleButton').addEventListener('click', () => eyeSwitch.toggle());
+  `
+
+  const advancedUsageCode = `
+import React, { useState, useEffect, useRef } from 'react';
+import EyeSwitch from 'eye-switch';
+
+function PasswordForm() {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const eyeSwitchRef = useRef(null);
+
+  useEffect(() => {
+    eyeSwitchRef.current = new EyeSwitch({
+      toggleMode: 'focus',
+      keyCombo: 'Ctrl+Shift+L',
+      onToggle: () => setPasswordVisible(prev => !prev)
+    });
+
+    const handleKeyDown = (event) => eyeSwitchRef.current.handleKeyDown(event);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  return (
+    <form>
+      <input
+        type={passwordVisible ? 'text' : 'password'}
+        placeholder="Enter password"
+      />
+      <button type="button" onClick={() => eyeSwitchRef.current.toggle()}>
+        {passwordVisible ? 'Hide' : 'Show'} Password
+      </button>
+    </form>
+  );
+}
+
+export default PasswordForm;
+  `
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200 flex flex-col antialiased">
       <header className="sticky top-0 bg-gray-900/80 backdrop-blur-sm z-10 border-b border-gray-800">
         <div className="max-w-6xl mx-auto w-full py-4 px-4">
           <div className="flex items-center justify-between">
-            <div 
-              className="flex items-center space-x-3"
-            >
+            <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-xl">
                 <EyeIcon className="h-4 w-4" />
               </div>
@@ -92,20 +152,17 @@ export default function Home() {
                 { id: 'installation', ref: installationRef },
                 { id: 'usage', ref: usageRef },
                 { id: 'API', ref: apiRef },
-              ].map((item, index) => (
-                <div
+              ].map((item) => (
+                <button
                   key={item.id}
+                  onClick={() => scrollToSection(item.ref)}
+                  className={`text-sm hover:text-blue-400 transition-colors ${
+                    activeSection === item.id ? 'text-blue-400 font-medium' : 'text-gray-300'
+                  }`}
+                  aria-current={activeSection === item.id ? 'page' : undefined}
                 >
-                  <button
-                    onClick={() => scrollToSection(item.ref)}
-                    className={`text-sm hover:text-blue-400 transition-colors ${
-                      activeSection === item.id ? 'text-blue-400 font-medium' : 'text-gray-300'
-                    }`}
-                    aria-current={activeSection === item.id ? 'page' : undefined}
-                  >
-                    {item.id === 'API' ? 'API' : item.id.charAt(0).toUpperCase() + item.id.slice(1)}
-                  </button>
-                </div>
+                  {item.id === 'API' ? 'API' : item.id.charAt(0).toUpperCase() + item.id.slice(1)}
+                </button>
               ))}
             </nav>
           </div>
@@ -114,9 +171,7 @@ export default function Home() {
 
       <main className="flex-grow max-w-6xl mx-auto w-full py-12 px-4" ref={mainRef}>
         <section className="mb-24">
-          <div 
-            className="flex flex-col lg:flex-row items-center justify-between gap-12"
-          >
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
             <div className="lg:w-1/2">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
                 Seamless Password Visibility Control
@@ -153,9 +208,7 @@ export default function Home() {
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
-                <div 
-                  className="absolute -top-12 right-1 whitespace-nowrap bg-blue-600 text-white text-sm py-2 px-4 rounded-md shadow-md"
-                >
+                <div className="absolute -top-12 right-1 whitespace-nowrap bg-blue-600 text-white text-sm py-2 px-4 rounded-md shadow-md">
                   Show password ({isMac ? '⌘' : 'Ctrl'} + 8)
                   <div className="absolute bottom-[-6px] right-[10px] w-3 h-3 bg-blue-600 transform rotate-45" />
                 </div>
@@ -164,11 +217,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section 
-          id="features" 
-          className="mb-24"
-          ref={featuresRef}
-        >
+        <section id="features" className="mb-24" ref={featuresRef}>
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Features</h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-300">
             {[
@@ -192,11 +241,7 @@ export default function Home() {
           </ul>
         </section>
 
-        <section 
-          id="installation" 
-          className="mb-24"
-          ref={installationRef}
-        >
+        <section id="installation" className="mb-24" ref={installationRef}>
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Installation</h2>
           <div className="bg-gray-800/30 p-6 rounded-lg mb-4 backdrop-blur-sm">
             <code className="text-blue-300 text-lg">npm install eye-switch</code>
@@ -207,95 +252,53 @@ export default function Home() {
           </div>
         </section>
 
-        <section 
-          id="usage" 
-          className="mb-24"
-          ref={usageRef}
-        >
+        <section id="usage" className="mb-24" ref={usageRef}>
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Usage</h2>
           <h3 className="text-2xl font-medium mb-4 text-gray-200">Basic Usage</h3>
-          <div className="bg-gray-800/30 p-6 rounded-lg mb-8 overflow-x-auto backdrop-blur-sm">
-            <pre className="text-blue-300">
-              {`import EyeSwitch from 'eye-switch';
-
-const eyeSwitch = new EyeSwitch({
-  toggleMode: 'all',
-  keyCombo: 'Ctrl+Shift+L',
-  onToggle: () => console.log('Visibility toggled')
-});
-
-eyeSwitch.on('visibilityChanged', ({ isVisible, affectedFields }) => {
-  const passwordFields = document.querySelectorAll('input[type="password"]');
-  passwordFields.forEach(field => {
-    field.type = isVisible ? 'text' : 'password';
-  });
-});
-
-document.addEventListener('keydown', (event) => eyeSwitch.handleKeyDown(event));
-
-document.querySelector('#toggleButton').addEventListener('click', () => eyeSwitch.toggle());`}
-            </pre>
+          <div className="bg-gray-800/30 rounded-lg mb-12 overflow-hidden backdrop-blur-sm">
+            <SyntaxHighlighter 
+              language="javascript" 
+              style={vscDarkPlus}
+              customStyle={{
+                background: 'transparent',
+                padding: '1.5rem',
+                fontSize: '1rem',
+                lineHeight: '1.5',
+              }}
+            >
+              {basicUsageCode}
+            </SyntaxHighlighter>
           </div>
           <h3 className="text-2xl font-medium mb-4 text-gray-200">Advanced Usage with React</h3>
-          <div className="bg-gray-800/30 p-6 rounded-lg mb-4 overflow-x-auto backdrop-blur-sm">
-            <pre className="text-blue-300">
-              {`import React, { useState, useEffect, useRef } from 'react';
-import EyeSwitch from 'eye-switch';
-
-function PasswordForm() {
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const eyeSwitchRef = useRef(null);
-
-  useEffect(() => {
-    eyeSwitchRef.current = new EyeSwitch({
-      toggleMode: 'focus',
-      keyCombo: 'Ctrl+Shift+L',
-      onToggle: () => setPasswordVisible(prev => !prev)
-    });
-
-    const handleKeyDown = (event) => eyeSwitchRef.current.handleKeyDown(event);
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  return (
-    <form>
-      <input
-        type={passwordVisible ? 'text' : 'password'}
-        placeholder="Enter password"
-      />
-      <button type="button" onClick={() => eyeSwitchRef.current.toggle()}>
-        {passwordVisible ? 'Hide' : 'Show'} Password
-      </button>
-    </form>
-  );
-}
-
-export default PasswordForm;`}
-            </pre>
+          <div className="bg-gray-800/30 rounded-lg mb-8 overflow-hidden backdrop-blur-sm">
+            <SyntaxHighlighter 
+              language="jsx" 
+              style={vscDarkPlus}
+              customStyle={{
+                background: 'transparent',
+                padding: '1.5rem',
+                fontSize: '1rem',
+                lineHeight: '1.5',
+              }}
+            >
+              {advancedUsageCode}
+            </SyntaxHighlighter>
           </div>
         </section>
 
-        <section 
-          id="API" 
-          className="mb-24"
-          ref={apiRef}
-        >
+        <section id="API" className="mb-24" ref={apiRef}>
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">API Reference</h2>
           <div className="bg-gray-800/30 p-6 rounded-lg backdrop-blur-sm">
             <h3 className="text-2xl font-medium mb-4 text-gray-200">EyeSwitch Class</h3>
             <p className="text-gray-300 mb-4">The <code className="bg-gray-700 px-2 py-1 rounded">EyeSwitch</code> class accepts the following options:</p>
             <ul className="list-disc list-inside space-y-2 text-gray-300 mb-6">
-              <li><code className="bg-gray-700 px-2 py-1 rounded">toggleMode</code>: 'focus' | 'all' (default: 'focus')</li>
-              <li><code className="bg-gray-700 px-2 py-1 rounded">keyCombo</code>: string (default: 'Ctrl+8' or 'Cmd+8' on Mac)</li>
+              <li><code className="bg-gray-700 px-2 py-1 rounded">toggleMode</code>: &apos;focus&apos; | &apos;all&apos; (default: &apos;focus&apos;)</li>
+              <li><code className="bg-gray-700 px-2 py-1 rounded">keyCombo</code>: string (default: &apos;Ctrl+8&apos; or &apos;Cmd+8&apos; on Mac)</li>
               <li><code className="bg-gray-700 px-2 py-1 rounded">onToggle</code>: () {'=>'} void</li>
             </ul>
             <h3 className="text-2xl font-medium mb-4 text-gray-200">Methods</h3>
             <ul className="list-disc list-inside space-y-2 text-gray-300 mb-6">
-              <li><code className="bg-gray-700 px-2 py-1 rounded">setToggleMode(mode: 'focus' | 'all')</code>: Set the toggle mode</li>
+              <li><code className="bg-gray-700 px-2 py-1 rounded">setToggleMode(mode: &apos;focus&apos; | &apos;all&apos;)</code>: Set the toggle mode</li>
               <li><code className="bg-gray-700 px-2 py-1 rounded">setKeyCombo(keyCombo: string)</code>: Set the keyboard shortcut</li>
               <li><code className="bg-gray-700 px-2 py-1 rounded">handleKeyDown(event: KeyboardEvent)</code>: Handle keydown events</li>
               <li><code className="bg-gray-700 px-2 py-1 rounded">setFocusedField(fieldId: string)</code>: Set the currently focused field</li>
