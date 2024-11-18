@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Coffee, ExternalLink, Github, EyeIcon, Play, Eye, EyeOff, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
@@ -325,9 +324,6 @@ export default PasswordForm;
               rel="noopener noreferrer"
               className="font-medium text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center gap-2"
             >
-              <Avatar className="h-5 w-5">
-                <AvatarImage src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avatar.jpg-2ovQ2Mm5NbdAcVhijZhEbPT9CCNnG5.jpeg" alt="@iziuqo" />
-              </Avatar>
               @iziuqo
             </a>
           </div>
