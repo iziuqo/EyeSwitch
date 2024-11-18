@@ -291,7 +291,7 @@ export default PasswordForm;`}
             <ul className="list-disc list-inside space-y-2 text-gray-300 mb-6">
               <li><code className="bg-gray-700 px-2 py-1 rounded">toggleMode</code>: 'focus' | 'all' (default: 'focus')</li>
               <li><code className="bg-gray-700 px-2 py-1 rounded">keyCombo</code>: string (default: 'Ctrl+8' or 'Cmd+8' on Mac)</li>
-              <li><code className="bg-gray-700 px-2 py-1 rounded">onToggle</code>: () => void</li>
+              <li><code className="bg-gray-700 px-2 py-1 rounded">onToggle</code>: () {'=>'} void</li>
             </ul>
             <h3 className="text-2xl font-medium mb-4 text-gray-200">Methods</h3>
             <ul className="list-disc list-inside space-y-2 text-gray-300 mb-6">
