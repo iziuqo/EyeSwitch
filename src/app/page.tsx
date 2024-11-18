@@ -181,7 +181,7 @@ export default PasswordForm;
               </p>
               <div className="flex flex-wrap gap-4">
                 <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105">
-                  <Link href="/demo" target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
+                  <Link href="/demo" className="inline-flex items-center">
                     <Play className="mr-2 h-4 w-4" />
                     See Demo
                   </Link>
