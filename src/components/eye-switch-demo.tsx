@@ -259,7 +259,7 @@ export default function EyeSwitchDemo() {
             <div className="text-xs text-gray-400">
               <span>Made with ☕️ by </span>
               <a
-                href="https://github.com/izaiascrs"
+                href="https://github.com/iziuqo"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
