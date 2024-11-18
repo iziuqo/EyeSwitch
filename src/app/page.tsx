@@ -157,7 +157,7 @@ export default function Home() {
                   className="absolute -top-12 right-1 whitespace-nowrap bg-blue-600 text-white text-sm py-2 px-4 rounded-md shadow-md"
                 >
                   Show password ({isMac ? '⌘' : 'Ctrl'} + 8)
-                  <div className="absolute bottom-{-6} right-{-10} w-3 h-3 bg-blue-600 transform rotate-45" />
+                  <div className="absolute bottom-[-6px] right-[10px] w-3 h-3 bg-blue-600 transform rotate-45" />
                 </div>
               </div>
             </div>
