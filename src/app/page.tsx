@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Coffee, ExternalLink, Github, EyeIcon, Play, Eye, EyeOff, ChevronRight } from 'lucide-react'
@@ -134,10 +136,10 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105">
-                  <a href="https://eye-switch-demo.vercel.app" target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
+                  <Link href="/demo" className="inline-flex items-center">
                     <Play className="mr-2 h-4 w-4" />
                     See Demo
-                  </a>
+                  </Link>
                 </Button>
                 <Button variant="outline" asChild className="bg-transparent text-gray-300 border-gray-600 hover:bg-gray-800 hover:text-white font-medium px-6 py-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105">
                   <a href="https://github.com/iziuqo/EyeSwitch" target="_blank" rel="noopener noreferrer" className="inline-flex items-center">
