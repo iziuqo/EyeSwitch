@@ -216,14 +216,14 @@ export default function EyeSwitchDemo() {
                 <div className="space-y-2">
                   <Label htmlFor="key-combo" className="text-xs font-medium text-gray-300">Keyboard Shortcut</Label>
                   <Select onValueChange={handleKeyComboChange} defaultValue={keyCombo}>
-                    <SelectTrigger id="key-combo" className="bg-gray-900/30 border-gray-800 text-gray-200 text-sm h-9">
+                    <SelectTrigger id="key-combo" className="bg-gray-800 border-gray-700 text-gray-200 text-sm h-9">
                       <SelectValue placeholder="Select a key combo" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-gray-800">
-                      <SelectItem value="Ctrl+8">Ctrl + 8</SelectItem>
-                      <SelectItem value="Cmd+8">Cmd + 8 (Mac)</SelectItem>
-                      <SelectItem value="Ctrl+Shift+L">Ctrl + Shift + L</SelectItem>
-                      <SelectItem value="Alt+P">Alt + P</SelectItem>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="Ctrl+8" className="text-gray-200 focus:bg-gray-700 focus:text-white">Ctrl + 8</SelectItem>
+                      <SelectItem value="Cmd+8" className="text-gray-200 focus:bg-gray-700 focus:text-white">Cmd + 8 (Mac)</SelectItem>
+                      <SelectItem value="Ctrl+Shift+L" className="text-gray-200 focus:bg-gray-700 focus:text-white">Ctrl + Shift + L</SelectItem>
+                      <SelectItem value="Alt+P" className="text-gray-200 focus:bg-gray-700 focus:text-white">Alt + P</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-gray-500">Current shortcut: <kbd className="px-1 py-0.5 text-xs font-medium text-gray-300 bg-gray-800 border border-gray-700 rounded">{keyCombo}</kbd></p>
