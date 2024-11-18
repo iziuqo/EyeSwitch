@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'EyeSwitch Demo',
+  title: 'EyeSwitch',
   description: 'Seamless password visibility control with keyboard shortcuts',
 }
 
