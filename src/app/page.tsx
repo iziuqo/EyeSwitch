@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Coffee, ExternalLink, Github, EyeIcon, Play, Eye, EyeOff, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { Input } from "@/components/ui/input"
-import { motion } from "framer-motion"
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('features')
@@ -77,11 +76,8 @@ export default function Home() {
       <header className="sticky top-0 bg-gray-900/80 backdrop-blur-sm z-10 border-b border-gray-800">
         <div className="max-w-6xl mx-auto w-full py-4 px-4">
           <div className="flex items-center justify-between">
-            <motion.div 
+            <div 
               className="flex items-center space-x-3"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
             >
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-xl">
                 <EyeIcon className="h-4 w-4" />
@@ -89,7 +85,7 @@ export default function Home() {
               <h1 className="text-2xl font-light tracking-tight">
                 Eye<span className="font-semibold">Switch</span>
               </h1>
-            </motion.div>
+            </div>
             <nav className="flex items-center space-x-4">
               {[
                 { id: 'features', ref: featuresRef },
@@ -97,11 +93,8 @@ export default function Home() {
                 { id: 'usage', ref: usageRef },
                 { id: 'API', ref: apiRef },
               ].map((item, index) => (
-                <motion.div
+                <div
                   key={item.id}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
                   <button
                     onClick={() => scrollToSection(item.ref)}
@@ -112,7 +105,7 @@ export default function Home() {
                   >
                     {item.id === 'API' ? 'API' : item.id.charAt(0).toUpperCase() + item.id.slice(1)}
                   </button>
-                </motion.div>
+                </div>
               ))}
             </nav>
           </div>
@@ -121,11 +114,8 @@ export default function Home() {
 
       <main className="flex-grow max-w-6xl mx-auto w-full py-12 px-4" ref={mainRef}>
         <section className="mb-24">
-          <motion.div 
+          <div 
             className="flex flex-col lg:flex-row items-center justify-between gap-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
           >
             <div className="lg:w-1/2">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">
@@ -163,26 +153,20 @@ export default function Home() {
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
-                <motion.div 
+                <div 
                   className="absolute -top-12 right-1 whitespace-nowrap bg-blue-600 text-white text-sm py-2 px-4 rounded-md shadow-md"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.5 }}
                 >
                   Show password ({isMac ? '⌘' : 'Ctrl'} + 8)
-                  <div className="absolute bottom-[-6px] right-[10px] w-3 h-3 bg-blue-600 transform rotate-45" />
-                </motion.div>
+                  <div className="absolute bottom-{-6px} right-{10px} w-3 h-3 bg-blue-600 transform rotate-45" />
+                </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </section>
 
-        <motion.section 
+        <section 
           id="features" 
           className="mb-24"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
           ref={featuresRef}
         >
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Features</h2>
@@ -197,26 +181,20 @@ export default function Home() {
               "Easy integration with existing projects",
               "Built with accessibility in mind"
             ].map((feature, index) => (
-              <motion.li 
+              <li 
                 key={index} 
                 className="flex items-start bg-gray-800/30 p-4 rounded-lg backdrop-blur-sm"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
               >
                 <ChevronRight className="h-6 w-6 text-blue-500 mr-2 flex-shrink-0" />
                 <span>{feature}</span>
-              </motion.li>
+              </li>
             ))}
           </ul>
-        </motion.section>
+        </section>
 
-        <motion.section 
+        <section 
           id="installation" 
           className="mb-24"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
           ref={installationRef}
         >
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Installation</h2>
@@ -227,14 +205,11 @@ export default function Home() {
           <div className="bg-gray-800/30 p-6 rounded-lg backdrop-blur-sm">
             <code className="text-blue-300 text-lg">yarn add eye-switch</code>
           </div>
-        </motion.section>
+        </section>
 
-        <motion.section 
+        <section 
           id="usage" 
           className="mb-24"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
           ref={usageRef}
         >
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Usage</h2>
@@ -302,14 +277,11 @@ function PasswordForm() {
 export default PasswordForm;`}
             </pre>
           </div>
-        </motion.section>
+        </section>
 
-        <motion.section 
+        <section 
           id="API" 
           className="mb-24"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
           ref={apiRef}
         >
           <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">API Reference</h2>
@@ -336,7 +308,7 @@ export default PasswordForm;`}
               <li><code className="bg-gray-700 px-2 py-1 rounded">keyComboChanged</code>: Fired when the keyboard shortcut changes</li>
             </ul>
           </div>
-        </motion.section>
+        </section>
       </main>
 
       <footer className="max-w-6xl mx-auto w-full py-8 px-4 border-t border-gray-800">
